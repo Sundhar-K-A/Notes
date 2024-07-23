@@ -8,7 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Note::class], version = 1, exportSchema = false)
+@Database(entities = [Note::class], version = 2, exportSchema = false)
 abstract class NoteRoomDatabase : RoomDatabase() {
 
     abstract fun noteDao(): NoteDao
@@ -19,16 +19,18 @@ abstract class NoteRoomDatabase : RoomDatabase() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            INSTANCE?.let { database ->
-                scope.launch {
-                    populateDatabase(database.noteDao())
-                }
+            val database = INSTANCE ?: return
+            scope.launch {
+                populateDatabase(database.noteDao())
             }
         }
 
-        suspend fun populateDatabase(noteDao: NoteDao) {
-            noteDao.deleteAllNotes()
-            var note = Note("0", "Sample Note title", "this is sample data for the body of the sample note")
+        private suspend fun populateDatabase(noteDao: NoteDao) {
+//            noteDao.deleteAllNotes()
+            val note = Note(
+                title = "Sample Note title",
+                body = "This is sample data for the body of the sample note"
+            )
             noteDao.insert(note)
         }
     }
@@ -45,7 +47,7 @@ abstract class NoteRoomDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteRoomDatabase::class.java,
-                    "student_database"
+                    "note_database"
                 )
                     .addCallback(NoteDatabaseCallback(scope))
                     .build()

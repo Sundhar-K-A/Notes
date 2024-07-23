@@ -4,7 +4,7 @@ import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
 
 class NoteRepository(private val noteDao: NoteDao) {
-    val allStudents: Flow<List<Note>> = noteDao.getAllNotes()
+    val allNotes: Flow<List<Note>> = noteDao.getAllNotes()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
