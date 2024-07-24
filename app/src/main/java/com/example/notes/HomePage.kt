@@ -1,5 +1,6 @@
 package com.example.notes
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,12 +33,20 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.notes.Database.Note
+import com.example.notes.ViewModels.NoteViewModel
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.unit.sp
+
 
 @Composable
-fun HomePageScreen(navController: NavController, modifier: Modifier = Modifier) {
-    var note by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf(listOf<String>()) }
-    var defaultNotes = listOf("Note 1", "Note 2", "Note 3","Note 1", "Note 2", "Note 3","Note 1", "Note 2", "Note 3","Note 1", "Note 2", "Note 3","Note 1", "Note 2", "Note 3",)
+fun HomePageScreen(navController: NavController, noteViewModel: NoteViewModel, modifier: Modifier = Modifier) {
+    //Todo add search
+    var searchQuery by remember { mutableStateOf("") }
+
+    val notesHomePage by noteViewModel.allNotes.observeAsState(initial = emptyList())
+
+    Log.d("NotesFromDB", "$notesHomePage")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,20 +56,16 @@ fun HomePageScreen(navController: NavController, modifier: Modifier = Modifier) 
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            NoteFieldWithSave(
+            NoteFieldWithSearch(
                 value = "",
                 onValueChange = {},
-                onSave = { note ->
-                    if (note.isNotBlank()) {
-                        notes += note
-                    }
-                }
+                onSearch = { },
             )
         }
         Spacer(modifier = Modifier.padding(7.dp))
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(defaultNotes) { currentNote ->
+                items(notesHomePage.asReversed()) { currentNote ->
                     NoteItemBox(currentNote)
                 }}
 
@@ -76,42 +82,57 @@ fun HomePageScreen(navController: NavController, modifier: Modifier = Modifier) 
     }
 }
 @Composable
-fun NoteFieldWithSave(
+fun NoteFieldWithSearch(
     value: String,
     onValueChange: (String) -> Unit,
-    onSave: (String) -> Unit
+    onSearch: (String) -> Unit
 ){
-    var note by remember { mutableStateOf(value) }
-
+    var searchString by remember { mutableStateOf(value) }
+    fun onSearch(queryNote: String){
+        Log.d("Search string", "$queryNote")
+    }
     OutlinedTextField(
-        value = note,
+        value = searchString,
         onValueChange = {
-            note = it
+            searchString = it
             onValueChange(it)
         },
-        label = { Text("Add a note") },
+        label = { Text("Enter the search text") },
         modifier = Modifier.fillMaxWidth(),
         trailingIcon = {
-            IconButton(onClick = { onSave(note) }) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Save")
+            IconButton(onClick = { onSearch(searchString) }) {
+                Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
             }
         }
     )
 }
 
-fun onSearch(queryNote: String){
-    // TODO: complete the search functionality
-}
+
 
 @Composable
-fun NoteItemBox(Note:String,modifier: Modifier = Modifier) {
+fun NoteItemBox(note:Note,modifier: Modifier = Modifier) {
+
     Box(modifier = modifier
         .fillMaxWidth()
         .padding(0.dp, 5.dp, 0.dp, 5.dp)
         .border(1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp))
+        .height(100.dp)
+        //todo add on click listener for each note
     ){
-        Text(text = Note,modifier = Modifier
-            .padding(16.dp)
-            .align(Alignment.Center))
+        Column(modifier= Modifier.fillMaxSize()){
+            Text(
+                text = note.title, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp, 5.dp, 5.dp, 5.dp),
+                fontSize = 24.sp,
+                
+            )
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = if (note.body.length <= 20) note.body else note.body.slice(0..40) + "...",
+                modifier = Modifier
+                    .padding(5.dp, 5.dp, 0.dp, 0.dp)
+            )
+        }
     }
 }

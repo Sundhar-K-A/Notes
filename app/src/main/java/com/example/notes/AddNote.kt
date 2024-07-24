@@ -51,7 +51,8 @@ fun AddNoteScreen(
                 title = title,
                 body = textState.text
             )
-            noteViewModel.insert(note)
+            if (title.isNotEmpty() && textState.text.isNotEmpty())
+                noteViewModel.insert(note)
         }
     }
     Column(
