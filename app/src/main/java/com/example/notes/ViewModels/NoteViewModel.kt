@@ -21,10 +21,10 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel() {
         noteRepository.insert(note)
     }
 
-    fun getNoteByTitle(title: String): LiveData<Note?> {
-        val result = MutableLiveData<Note?>()
+    fun getNotesByTitle(title: String): LiveData<List<Note>> {
+        val result = MutableLiveData<List<Note>>(emptyList())
         viewModelScope.launch {
-            result.value = noteRepository.getNoteByTitle(title)
+            result.value = noteRepository.getNotesByTitle(title)
         }
         return result
     }

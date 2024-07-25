@@ -26,7 +26,7 @@ abstract class NoteRoomDatabase : RoomDatabase() {
         }
 
         private suspend fun populateDatabase(noteDao: NoteDao) {
-//            noteDao.deleteAllNotes()
+            noteDao.deleteAllNotes()
             val note = Note(
                 title = "Sample Note title",
                 body = "This is sample data for the body of the sample note"

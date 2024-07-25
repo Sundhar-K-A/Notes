@@ -43,12 +43,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomePageScreen(navController: NavController, noteViewModel: NoteViewModel, modifier: Modifier = Modifier) {
-    //Todo add search
     var searchQuery by remember { mutableStateOf("") }
 
-    val notesHomePage by noteViewModel.allNotes.observeAsState(initial = emptyList())
+    val allNotes by noteViewModel.allNotes.observeAsState(initial = emptyList())
+    val filteredNotes = allNotes.filter{ it.title.contains(searchQuery, ignoreCase = true) or it.body.contains(searchQuery, ignoreCase = true) } ?: emptyList()
+    Log.d("filteredNotes",searchQuery)
+    Log.d("filteredNotes",filteredNotes.toString())
 
-    Log.d("NotesFromDB", "$notesHomePage")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,14 +61,13 @@ fun HomePageScreen(navController: NavController, noteViewModel: NoteViewModel, m
         ) {
             NoteFieldWithSearch(
                 value = "",
-                onValueChange = {},
-                onSearch = { },
+                onValueChange = { searchQuery= it },
             )
         }
         Spacer(modifier = Modifier.padding(7.dp))
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(notesHomePage.asReversed()) { currentNote ->
+                items(if (searchQuery.isEmpty()) allNotes.asReversed() else filteredNotes.asReversed()) { currentNote ->
                     NoteItemBox(currentNote,noteViewModel,navController)
                 }}
 
@@ -87,12 +87,8 @@ fun HomePageScreen(navController: NavController, noteViewModel: NoteViewModel, m
 fun NoteFieldWithSearch(
     value: String,
     onValueChange: (String) -> Unit,
-    onSearch: (String) -> Unit
 ){
     var searchString by remember { mutableStateOf(value) }
-    fun onSearch(queryNote: String){
-        Log.d("Search string", "$queryNote")
-    }
     OutlinedTextField(
         value = searchString,
         onValueChange = {
@@ -101,11 +97,6 @@ fun NoteFieldWithSearch(
         },
         label = { Text("Enter the search text") },
         modifier = Modifier.fillMaxWidth(),
-        trailingIcon = {
-            IconButton(onClick = { onSearch(searchString) }) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-            }
-        }
     )
 }
 
@@ -133,7 +124,7 @@ fun NoteItemBox(note:Note,noteViewModel: NoteViewModel,navController: NavControl
             )
             Spacer(modifier = Modifier.padding(10.dp))
             Text(
-                text = if (note.body.length <= 20) note.body else note.body.slice(0..40) + "...",
+                text = if (note.body.length <= 40) note.body else note.body.slice(0..40) + "...",
                 modifier = Modifier
                     .padding(5.dp, 5.dp, 0.dp, 0.dp)
             )

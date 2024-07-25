@@ -11,8 +11,8 @@ class NoteRepository(private val noteDao: NoteDao) {
     suspend fun insert(note: Note) {
         noteDao.insert(note)
     }
-    suspend fun getNoteByTitle(title: String): Note? {
-        return noteDao.getNoteByTitle(title)
+    suspend fun getNotesByTitle(title: String): List<Note> {
+        return noteDao.getNotesByTitle(title)
     }
     suspend fun getNoteByID(id:Int):Note?{
         return noteDao.getNoteByID(id)

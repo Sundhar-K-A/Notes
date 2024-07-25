@@ -21,12 +21,12 @@ interface NoteDao {
     @Query("SELECT * FROM note_table WHERE id=:id")
     suspend fun getNoteByID(id:Int):Note?
 
-//    @Query("DELETE FROM note_table")
-//    suspend fun deleteAllNotes()
+    @Query("DELETE FROM note_table")
+    suspend fun deleteAllNotes()
 
     @Query("SELECT * FROM note_table")
     fun getAllNotes(): Flow<List<Note>>
 
-    @Query("SELECT * FROM note_table WHERE title = :title LIMIT 1")
-    suspend fun getNoteByTitle(title: String): Note?
+    @Query("SELECT * FROM note_table WHERE title LIKE '%' || :title || '%'")
+    suspend fun getNotesByTitle(title: String): List<Note>
 }
