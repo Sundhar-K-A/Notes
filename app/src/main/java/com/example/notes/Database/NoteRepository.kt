@@ -14,6 +14,13 @@ class NoteRepository(private val noteDao: NoteDao) {
     suspend fun getNoteByTitle(title: String): Note? {
         return noteDao.getNoteByTitle(title)
     }
+    suspend fun getNoteByID(id:Int):Note?{
+        return noteDao.getNoteByID(id)
+    }
+    suspend fun update(note: Note) {
+        noteDao.update(note)
+    }
+
 //    fun searchNotesByTitle(searchString: String): Flow<List<Note>> {
 //        return noteDao.getNoteByTitle("%$searchString%")
 //    }

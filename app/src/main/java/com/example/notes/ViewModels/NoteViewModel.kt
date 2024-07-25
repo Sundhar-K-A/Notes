@@ -1,8 +1,6 @@
 package com.example.notes.ViewModels
 
-
 import androidx.lifecycle.*
-import androidx.lifecycle.asLiveData
 import com.example.notes.Database.Note
 import com.example.notes.Database.NoteRepository
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +10,12 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel() {
 
     val allNotes: LiveData<List<Note>> = noteRepository.allNotes.asLiveData()
     val notes: Flow<List<Note>> = noteRepository.allNotes
+
+    val selectedNote = MutableLiveData<Note?>()
+
+    fun getNoteById(id: Int) = viewModelScope.launch {
+        selectedNote.value = noteRepository.getNoteByID(id)
+    }
 
     fun insert(note: Note) = viewModelScope.launch {
         noteRepository.insert(note)
@@ -23,6 +27,10 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel() {
             result.value = noteRepository.getNoteByTitle(title)
         }
         return result
+    }
+
+    fun update(note: Note) = viewModelScope.launch {
+        noteRepository.update(note)
     }
 }
 

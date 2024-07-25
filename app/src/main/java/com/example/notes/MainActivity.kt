@@ -24,7 +24,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Initialize the database, repository, and ViewModel
         val database = NoteRoomDatabase.getDatabase(this, activityScope)
         val repository = NoteRepository(database.noteDao())
         val viewModelFactory = NoteViewModelFactory(repository)
@@ -36,13 +35,14 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 
-    @Composable
-    fun Navigation(noteViewModel: NoteViewModel) {
-        val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = "home") {
-            composable("home") { HomePageScreen(navController,noteViewModel) }
-            composable("addNote") { AddNoteScreen(navController, noteViewModel) }
-        }
+@Composable
+fun Navigation(noteViewModel: NoteViewModel) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") { HomePageScreen(navController, noteViewModel) }
+        composable("addNote") { AddNoteScreen(navController, noteViewModel) }
+        composable("viewNote") { viewNoteScreen(navController,noteViewModel) }
     }
 }

@@ -2,6 +2,7 @@ package com.example.notes
 
 import android.util.Log
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import com.example.notes.Database.Note
 import com.example.notes.ViewModels.NoteViewModel
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
@@ -66,7 +68,7 @@ fun HomePageScreen(navController: NavController, noteViewModel: NoteViewModel, m
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(notesHomePage.asReversed()) { currentNote ->
-                    NoteItemBox(currentNote)
+                    NoteItemBox(currentNote,noteViewModel,navController)
                 }}
 
             Button(
@@ -110,14 +112,16 @@ fun NoteFieldWithSearch(
 
 
 @Composable
-fun NoteItemBox(note:Note,modifier: Modifier = Modifier) {
-
+fun NoteItemBox(note:Note,noteViewModel: NoteViewModel,navController: NavController,modifier: Modifier = Modifier) {
     Box(modifier = modifier
         .fillMaxWidth()
         .padding(0.dp, 5.dp, 0.dp, 5.dp)
         .border(1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp))
         .height(100.dp)
-        //todo add on click listener for each note
+        .clickable {
+            noteViewModel.selectedNote.value = note
+            navController.navigate("viewNote")
+        }
     ){
         Column(modifier= Modifier.fillMaxSize()){
             Text(
